@@ -9,16 +9,17 @@ import (
 
 type Stack struct {
 	Verbose bool
+	Forward bool		// TODO
 
 	ifaces []*Iface
 
 	neighTable neighTable
+	routeTable routeTable
 
 	ipID     uint16
 	ipFilter map[string]struct{}
 	// ip4: string(ip4) len=4
 	// ip6: string(ip6) len=16
-	routeTable routeTable
 
 	tcpSockTable tcpSockTable
 }
@@ -28,13 +29,13 @@ func NewStack(ifaces []*Iface) (stack *Stack) {
 	stack.ifaces = ifaces
 
 	stack.neighTable.entries = make(map[string]*neighEntry)
+	stack.routeTable.entries4 = make([]*routeEntry, 0)
+	stack.routeTable.entries6 = make([]*routeEntry, 0)
 
 	stack.ipFilter = make(map[string]struct{})
 	for _, iface := range ifaces {
 		stack.ipFilter[string(iface.ip4)] = struct{}{}
 	}
-	stack.routeTable.entries4 = make([]*routeEntry, 0)
-	stack.routeTable.entries6 = make([]*routeEntry, 0)
 
 	return
 }

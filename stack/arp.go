@@ -44,6 +44,10 @@ func (stack *Stack) arpRecv(ifidx int, pkt []byte) {
 		stack.arpRequestRecv(ifidx, pkt)
 	case ARP_REPLY:
 		stack.arpReplyRecv(ifidx, pkt)
+	default:
+		if stack.Verbose {
+			log.Print("arp: invalid type")
+		}
 	}
 }
 

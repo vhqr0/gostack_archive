@@ -39,6 +39,9 @@ func (stack *Stack) ethRecv(ifidx int, pkt []byte) {
 	}
 
 	if _, ok := iface.macFilter[string(pkt[:6])]; !ok {
+		if stack.Verbose {
+			log.Printf("eth: drop %v", net.HardwareAddr(pkt[6:12]))
+		}
 		return
 	}
 
@@ -55,6 +58,10 @@ func (stack *Stack) ethRecv(ifidx int, pkt []byte) {
 		stack.ip4Recv(ifidx, pkt)
 	case ETH_P_IPV6:
 		// TODO
+	default:
+		if stack.Verbose {
+			log.Print("eth recv: invalid type")
+		}
 	}
 }
 

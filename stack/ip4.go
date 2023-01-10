@@ -51,6 +51,9 @@ func (stack *Stack) ip4Recv(ifidx int, pkt []byte) {
 
 	if dstKey != IP_BROADCAST {
 		if _, ok := stack.ipFilter[dstKey]; !ok {
+			if stack.Verbose {
+				log.Printf("ip4: drop %v", net.IP(pkt[16:20]))
+			}
 			return
 		}
 	}
@@ -58,6 +61,9 @@ func (stack *Stack) ip4Recv(ifidx int, pkt []byte) {
 	flags := (pkt[6] & 0xe0) >> 5
 	frag_offsets := binary.BigEndian.Uint16(pkt[6:8]) & 0x1fff
 	if flags&0x1 != 0 || frag_offsets != 0 {
+		if stack.Verbose {
+			log.Printf("ip4: drop fragment %v", net.IP(pkt[16:20]))
+		}
 		return
 	}
 
@@ -77,6 +83,10 @@ func (stack *Stack) ip4Recv(ifidx int, pkt []byte) {
 		// TODO
 	case IPPROTO_UDP:
 		// TODO
+	default:
+		if stack.Verbose {
+			log.Printf("ip4: invalid protocol")
+		}
 	}
 }
 
@@ -128,7 +138,7 @@ func (stack *Stack) ip4Send(proto uint8, payload []byte, ifidx int, dst, src net
 	if entry == nil {
 		err = &DstUnreachError{Dst: dst}
 		if stack.Verbose {
-			log.Printf("ip4: %v", err)
+			log.Printf("ip4 send: %v", err)
 		}
 		return
 	}
@@ -148,7 +158,7 @@ func (stack *Stack) ip4Send(proto uint8, payload []byte, ifidx int, dst, src net
 	if len(pkt) > iface.mtu {
 		err = &PktTooBigError{}
 		if stack.Verbose {
-			log.Printf("ip4: %v", err)
+			log.Printf("ip4 send: %v", err)
 		}
 		return
 	}
@@ -157,7 +167,7 @@ func (stack *Stack) ip4Send(proto uint8, payload []byte, ifidx int, dst, src net
 	if mac == nil {
 		err = &HostUnreachError{Host: dst}
 		if stack.Verbose {
-			log.Printf("ip4: %v", err)
+			log.Printf("ip4 send: %v", err)
 		}
 		return
 	}

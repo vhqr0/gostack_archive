@@ -26,6 +26,10 @@ func (stack *Stack) icmp4Recv(pkt []byte, ifidx int, src, dst net.IP) {
 	switch typ {
 	case ICMP_ECHO:
 		stack.icmp4EchoRecv(pkt, ifidx, src, dst)
+	// default:
+	// 	if stack.Verbose {
+	// 		log.Printf("icmp4: invalid type")
+	// 	}
 	}
 }
 

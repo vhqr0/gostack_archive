@@ -10,9 +10,9 @@ type routeTable struct {
 }
 
 type routeEntry struct {
-	idx int
-	dst net.IP
-	src net.IP
+	idx int    // iface index
+	dst net.IP // ip of dst mac to lookup, may be nil
+	src net.IP // default src ip, cannot be nil
 	net *net.IPNet
 }
 
