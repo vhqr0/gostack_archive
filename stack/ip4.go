@@ -5,7 +5,7 @@ import (
 	"log"
 	"net"
 
-	"github.com/vhqr0/gostack/util"
+	"github.com/vhqr0/gostack/stack/util"
 )
 
 const (

@@ -5,7 +5,7 @@ import (
 	"net"
 	"os"
 
-	"github.com/vhqr0/gostack/util"
+	"github.com/vhqr0/gostack/stack/util"
 )
 
 type Iface struct {
