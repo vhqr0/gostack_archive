@@ -24,11 +24,17 @@ const (
 )
 
 type tcpSock struct {
-	state  int
-	local  net.TCPAddr
-	peer   net.TCPAddr
+	state int
+	ver   int
+	ifidx int
+	local net.TCPAddr
+	peer  net.TCPAddr
+
 	recvCh chan []byte
 	sendCh chan []byte
+
+	acceptCh    chan *tcpSock
+	listenQueue map[*tcpSock]struct{}
 }
 
 func (sock *tcpSock) Init() (err error) {

@@ -35,6 +35,9 @@ func (stack *Stack) ethRecv(ifidx int, pkt []byte) {
 	iface := stack.ifaces[ifidx]
 
 	if len(pkt) < 14 {
+		if stack.Verbose {
+			log.Print("eth: invalid length")
+		}
 		return
 	}
 

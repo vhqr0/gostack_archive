@@ -2,6 +2,7 @@ package util
 
 import (
 	"encoding/binary"
+	"net"
 )
 
 func CheckSum(msg []byte) uint16 {
@@ -16,4 +17,12 @@ func CheckSum(msg []byte) uint16 {
 	sum = (sum >> 16) + (sum & 0xffff)
 	sum += (sum >> 16)
 	return ^uint16(sum)
+}
+
+func TCP4CheckSum(msg []byte, src, dst net.IP) uint16 {
+	buf := make([]byte, len(msg)+8)
+	copy(buf[:4], src)
+	copy(buf[4:8], dst)
+	copy(buf[8:], msg)
+	return CheckSum(buf)
 }

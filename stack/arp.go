@@ -26,6 +26,9 @@ func (stack *Stack) arpRecv(ifidx int, pkt []byte) {
 	// ipdst   byte[4]
 
 	if len(pkt) < 28 {
+		if stack.Verbose {
+			log.Print("arp: invalid length")
+		}
 		return
 	}
 
@@ -35,6 +38,9 @@ func (stack *Stack) arpRecv(ifidx int, pkt []byte) {
 	prosize := pkt[5]
 
 	if hwtyp != ARP_ETH || protyp != ARP_IPV4 || hwsize != 6 || prosize != 4 {
+		if stack.Verbose {
+			log.Print("arp: invalid packet")
+		}
 		return
 	}
 
@@ -55,6 +61,9 @@ func (stack *Stack) arpRequestRecv(ifidx int, pkt []byte) {
 	iface := stack.ifaces[ifidx]
 
 	if _, ok := stack.ipFilter[string(pkt[24:28])]; !ok {
+		if stack.Verbose {
+			log.Printf("arp request: drop %v", net.IP(pkt[24:28]))
+		}
 		return
 	}
 
@@ -85,6 +94,9 @@ func (stack *Stack) arpReplyRecv(ifidx int, pkt []byte) {
 	iface := stack.ifaces[ifidx]
 
 	if !bytes.Equal(pkt[18:24], iface.mac) {
+		if stack.Verbose {
+			log.Printf("arp reply: drop %v", net.HardwareAddr(pkt[18:24]))
+		}
 		return
 	}
 

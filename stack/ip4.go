@@ -30,6 +30,9 @@ func (stack *Stack) ip4Recv(ifidx int, pkt []byte) {
 	// dst               byte[4]
 
 	if len(pkt) < 20 {
+		if stack.Verbose {
+			log.Print("ip4: invalid length")
+		}
 		return
 	}
 
@@ -38,10 +41,16 @@ func (stack *Stack) ip4Recv(ifidx int, pkt []byte) {
 	tlen := binary.BigEndian.Uint16(pkt[2:4])
 
 	if ver != 4 || hlen != 5 {
+		if stack.Verbose {
+			log.Print("ip4: invalid packet")
+		}
 		return
 	}
 
 	if len(pkt) < int(tlen) {
+		if stack.Verbose {
+			log.Print("ip4: invalid packet length")
+		}
 		return
 	}
 
@@ -80,7 +89,7 @@ func (stack *Stack) ip4Recv(ifidx int, pkt []byte) {
 	case IPPROTO_ICMP:
 		stack.icmp4Recv(pkt, ifidx, src, dst)
 	case IPPROTO_TCP:
-		// TODO
+		stack.tcpRecv(4, pkt, ifidx, src, dst)
 	case IPPROTO_UDP:
 		// TODO
 	default:
@@ -115,6 +124,9 @@ func (stack *Stack) ip4Send(proto uint8, payload []byte, ifidx int, dst, src net
 	dstKey := string(dst)
 
 	if _, ok := stack.ipFilter[dstKey]; ok || dst[0] == 127 {
+		if stack.Verbose {
+			log.Printf("ip4: send loopback %v", dst)
+		}
 		if src == nil {
 			copy(pkt[12:16], dst)
 		}
@@ -123,6 +135,9 @@ func (stack *Stack) ip4Send(proto uint8, payload []byte, ifidx int, dst, src net
 	}
 
 	if dstKey == IP_BROADCAST {
+		if stack.Verbose {
+			log.Printf("ip4: send broadcast %v", dst)
+		}
 		iface := stack.ifaces[ifidx]
 		if src == nil {
 			copy(pkt[12:16], iface.ip4)
